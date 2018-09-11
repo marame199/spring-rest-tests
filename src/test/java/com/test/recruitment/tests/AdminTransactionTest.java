@@ -22,92 +22,104 @@ public class AdminTransactionTest extends AbstractTest {
 
 	@Test
 	public void createTransaction() throws Exception {
-		String request = getRequest("createOk");
+		final String request = getRequest("createOk");
 
 		mockMvc.perform(
-				post("/accounts/1/transactions").contentType(
+				post("/accounts/1/transactions/add").contentType(
 						MediaType.APPLICATION_JSON).content(request))
-				.andExpect(status().isCreated());
+		.andExpect(status().isCreated());
 	}
 
 	@Test
 	public void createTransactionBadRequest() throws Exception {
-		String request = getRequest("createBadRequest");
+		final String request = getRequest("createBadRequest");
 
 		mockMvc.perform(
-				post("/accounts/1/transactions").contentType(
+				post("/accounts/1/transactions/add").contentType(
 						MediaType.APPLICATION_JSON).content(request))
-				.andExpect(status().isBadRequest());
+		.andExpect(status().isBadRequest());
+	}
+
+	/**
+	 * add a transaction with an existing id
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void createTransactionExistingId() throws Exception {
+		final String request = getRequest("createExistingId");
+		mockMvc.perform(post("/accounts/1/transactions/add").contentType(MediaType.APPLICATION_JSON).content(request))
+		.andExpect(status().isNotModified());
 	}
 
 	@Test
 	public void updateTransaction() throws Exception {
-		String request = getRequest("updateOk");
+		final String request = getRequest("updateOk");
 
 		mockMvc.perform(
 				put("/accounts/1/transactions/3").contentType(
 						MediaType.APPLICATION_JSON).content(request))
-				.andExpect(status().isNoContent());
+		.andExpect(status().isNoContent());
 	}
 
 	@Test
 	public void updateTransactionWhichNotBelongToTheAccount() throws Exception {
-		String request = getRequest("updateOk");
+		final String request = getRequest("updateOk");
 
 		mockMvc.perform(
 				put("/accounts/2/transactions/3").contentType(
 						MediaType.APPLICATION_JSON).content(request))
-				.andExpect(status().isForbidden());
+		.andExpect(status().isForbidden());
 	}
 
 	@Test
 	public void updateUnexistingTransaction() throws Exception {
-		String request = getRequest("updateOk");
+		final String request = getRequest("updateOk");
 
 		mockMvc.perform(
 				put("/accounts/1/transactions/8").contentType(
 						MediaType.APPLICATION_JSON).content(request))
-				.andExpect(status().isNotFound());
+		.andExpect(status().isNotFound());
 	}
 
 	@Test
 	public void updateTransactionBadRequest() throws Exception {
-		String request = "test";
+		final String request = "test";
 
 		mockMvc.perform(
 				put("/accounts/1/transactions/3").contentType(
 						MediaType.APPLICATION_JSON).content(request))
-				.andExpect(status().isBadRequest());
+		.andExpect(status().isBadRequest());
 	}
 
 	@Test
 	public void deleteTransaction() throws Exception {
-        mockMvc.perform(delete("/accounts/1/transactions/delete/1")).andExpect(
+		mockMvc.perform(delete("/accounts/1/transactions/delete/1")).andExpect(
 				status().isNoContent());
 	}
 
 	@Test
 	public void deleteTransactionWhichNotBelongToTheAccount() throws Exception {
-        mockMvc.perform(delete("/accounts/2/transactions/delete/2")).andExpect(
+		mockMvc.perform(delete("/accounts/2/transactions/delete/2")).andExpect(
 				status().isForbidden());
 	}
 
 	@Test
 	public void deleteUnexistingTransaction() throws Exception {
-        mockMvc.perform(delete("/accounts/1/transactions/delete/99")).andExpect(
+		mockMvc.perform(delete("/accounts/1/transactions/delete/99")).andExpect(
 				status().isNotFound());
 	}
 
-    /**
-     * test the deletion of transaction for an unexisting account
-     *
-     * @throws Exception
-     */
-    @Test
-    public void deleteTransactionUnexistingAccount() throws Exception {
-        mockMvc.perform(delete("/accounts/100/transactions/delete/1")).andExpect(
-                status().isNotFound());
-    }
+	/**
+	 * test the deletion of transaction for an unexisting account
+	 *
+	 * @throws Exception
+	 */
+	@Test
+	public void deleteTransactionUnexistingAccount() throws Exception {
+		mockMvc.perform(delete("/accounts/100/transactions/delete/1")).andExpect(
+				status().isNotFound());
+	}
 
 	/**
 	 * Get json request from test file
@@ -117,8 +129,8 @@ public class AdminTransactionTest extends AbstractTest {
 	 * @return the request
 	 * @throws IOException
 	 */
-	private String getRequest(String name) throws IOException {
-		StringWriter writer = new StringWriter();
+	private String getRequest(final String name) throws IOException {
+		final StringWriter writer = new StringWriter();
 		IOUtils.copy(Thread.currentThread().getContextClassLoader()
 				.getResourceAsStream("json/" + name + ".json"), writer);
 		return writer.toString();

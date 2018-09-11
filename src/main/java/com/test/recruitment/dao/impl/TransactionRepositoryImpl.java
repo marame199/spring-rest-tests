@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 
 import com.test.recruitment.dao.TransactionRepository;
 import com.test.recruitment.entity.Transaction;
+import com.test.recruitment.json.TransactionResponse;
 
 /**
  * Implementation of {@link TransactionRepository}
@@ -22,15 +23,15 @@ import com.test.recruitment.entity.Transaction;
  */
 @Repository
 public class TransactionRepositoryImpl implements TransactionRepository,
-		InitializingBean {
+InitializingBean {
 
 	private List<Transaction> transactions;
 
 	@Override
-    public void afterPropertiesSet() {
+	public void afterPropertiesSet() {
 		transactions = new ArrayList<>();
 		{
-			Transaction transaction = new Transaction();
+			final Transaction transaction = new Transaction();
 			transaction.setAccountId("1");
 			transaction.setBalance(BigDecimal.valueOf(42.12));
 			transaction.setId("1");
@@ -38,7 +39,7 @@ public class TransactionRepositoryImpl implements TransactionRepository,
 			transactions.add(transaction);
 		}
 		{
-			Transaction transaction = new Transaction();
+			final Transaction transaction = new Transaction();
 			transaction.setAccountId("1");
 			transaction.setBalance(BigDecimal.valueOf(456.00));
 			transaction.setId("2");
@@ -46,7 +47,7 @@ public class TransactionRepositoryImpl implements TransactionRepository,
 			transactions.add(transaction);
 		}
 		{
-			Transaction transaction = new Transaction();
+			final Transaction transaction = new Transaction();
 			transaction.setAccountId("1");
 			transaction.setBalance(BigDecimal.valueOf(-12.12));
 			transaction.setId("3");
@@ -56,33 +57,43 @@ public class TransactionRepositoryImpl implements TransactionRepository,
 	}
 
 	@Override
-	public Transaction findById(String id) {
+	public Transaction findById(final String id) {
 		return transactions.stream()
 				.filter(transaction -> transaction.getId().equals(id))
 				.findFirst().orElse(null);
 	}
 
 	@Override
-	public Page<Transaction> getTransactionsByAccount(String accountId,
-			Pageable p) {
-        return new PageImpl<Transaction>(getTransactionList(accountId));
-    }
+	public Page<Transaction> getTransactionsByAccount(final String accountId,
+			final Pageable p) {
+		return new PageImpl<>(getTransactionList(accountId));
+	}
 
-    @Override
-    public List<Transaction> getTransactionList(String accountId) {
-        return transactions.stream()
+	@Override
+	public List<Transaction> getTransactionList(final String accountId) {
+		return transactions.stream()
 				.filter(t -> t.getAccountId().equals(accountId))
-                .collect(Collectors.toList());
-    }
+				.collect(Collectors.toList());
+	}
 
-    @Override
-    public void deleteTransaction(String transactionId) {
-        transactions.remove(findById(transactionId));
-    }
+	@Override
+	public void deleteTransaction(final String transactionId) {
+		transactions.remove(findById(transactionId));
+	}
 
 
-    @Override
-    public boolean exists(String transactionId) {
-        return transactions.stream().anyMatch(trx -> trx.getId().equals(transactionId));
-    }
+	@Override
+	public boolean exists(final String transactionId) {
+		return transactions.stream().anyMatch(trx -> trx.getId().equals(transactionId));
+	}
+
+	@Override
+	public void addTransaction(final String accountId, final TransactionResponse transaction) {
+		final Transaction trx = new Transaction();
+		trx.setAccountId(accountId);
+		trx.setBalance(transaction.getBalance());
+		trx.setNumber(transaction.getNumber());
+		trx.setId(transaction.getId());
+		transactions.add(trx);
+	}
 }

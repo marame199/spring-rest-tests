@@ -119,8 +119,21 @@ public class TransactionService {
     public boolean isTransactionExist(final String transactionId) {
         return transactionRepository.exists(transactionId);
     }
-
-
+/**
+ * create a transaction for the account 
+ * @param accountId the accound id 
+ * @param transaction the new  transaction to create 
+ */
+	public void addTransaction(final String accountId,final TransactionResponse transaction){
+		checkAccountId(accountId);
+		Transaction existingTrx=transactionRepository.findById(transaction.getId());
+		if(null!=existingTrx) {
+			throw new  ServiceException(ErrorCode.EXISTING_TRANSACTION,
+			        "The transaction already exists ");
+		}else {
+			transactionRepository.addTransaction(accountId, transaction);
+		}
+}
 
 
 }
