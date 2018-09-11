@@ -67,4 +67,13 @@ public interface TransactionRepository {
 	 * @param transaction the transaction associated to the account
 	 */
 	void addTransaction(String accountId, TransactionResponse transaction);
+
+	/**
+	 * update a transaction
+	 * 
+	 * @param accountId   the account id
+	 * @param transactionId TODO
+	 * @param transaction the transaction associated to the account
+	 */
+	void updateTransaction(String accountId, String transactionId, TransactionResponse transaction);
 }

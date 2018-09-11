@@ -90,10 +90,31 @@ InitializingBean {
 	@Override
 	public void addTransaction(final String accountId, final TransactionResponse transaction) {
 		final Transaction trx = new Transaction();
+		updateFields(accountId, trx, transaction);
+		transactions.add(trx);
+	}
+
+	@Override
+	public void updateTransaction(final String accountId, final String transactionId, final TransactionResponse transaction) {
+		final Transaction trx = findById(transactionId);
+		final int trxIndex = transactions.indexOf(trx);
+		trx.setBalance(transaction.getBalance());
+		trx.setNumber(transaction.getNumber());
+		transactions.set(trxIndex, trx);
+
+	}
+
+	/**
+	 * update fields for a transaction
+	 * 
+	 * @param accountId
+	 * @param trx
+	 * @param transaction
+	 */
+	private void updateFields(final String accountId, final Transaction trx, final TransactionResponse transaction) {
 		trx.setAccountId(accountId);
 		trx.setBalance(transaction.getBalance());
 		trx.setNumber(transaction.getNumber());
 		trx.setId(transaction.getId());
-		transactions.add(trx);
 	}
 }

@@ -62,6 +62,12 @@ public class TransactionControllerImpl implements TransactionController {
 		log.info("The transaction has been succesfussly created for the accound {} ", accountId);
 		return new ResponseEntity<Void>(HttpStatus.CREATED);
 	}
-	
 
+	@Override
+	public ResponseEntity<Void> updateTransaction(@PathVariable("accountId") String accountId, @PathVariable String transactionId, @Valid @RequestBody TransactionResponse transaction) {
+		transactionService.updateTransaction(accountId, transactionId, transaction);
+		log.info("The transaction {}  has been succesfussly updated for the accound {} ", transactionId, accountId);
+		return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
+	}
+	
 }

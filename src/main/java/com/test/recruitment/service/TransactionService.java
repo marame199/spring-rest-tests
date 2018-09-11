@@ -59,6 +59,30 @@ public class TransactionService {
                     "Transaction  doesn't exist");
         }
     }
+    
+    /**
+     * check if  a transaction is associated with an account 
+     * @param accountId the account id 
+     * @param transactionId the trnasaction id to check
+     */
+    private void checkForbiddenTransaction(String accountId, String transactionId) {
+        transactionRepository.getTransactionList(accountId)
+        .stream().
+        filter(trx -> transactionId.equals(trx.getId())).
+        findFirst().orElseThrow(() -> new ServiceException(ErrorCode.FORBIDDEN_TRANSACTION,
+        "Transaction forbidden "));
+    }
+    
+    /**
+     * checks to make before deleting or updating a transaction
+     * @param accountId
+     * @param transactionId
+     */
+    private void checkTransaction(String accountId, String transactionId) {
+        checkAccountId(accountId);
+        checkTransactionId(transactionId);
+        checkForbiddenTransaction(accountId, transactionId);
+    }
 
     /**
 	 * Get transactions by account
@@ -83,13 +107,7 @@ public class TransactionService {
      * @param transactionId the transaction id
      */
     public void deleteTransaction(final String accountId, final String transactionId) throws ServiceException {
-        checkAccountId(accountId);
-        checkTransactionId(transactionId);
-        transactionRepository.getTransactionList(accountId)
-                .stream().
-                filter(trx -> transactionId.equals(trx.getId())).
-                findFirst().orElseThrow(() -> new ServiceException(ErrorCode.FORBIDDEN_TRANSACTION,
-                "Transaction forbidden "));
+    	checkTransaction(accountId,transactionId);
         transactionRepository.deleteTransaction(transactionId);
     }
 
@@ -116,7 +134,7 @@ public class TransactionService {
      * @param transactionId the transaction id
      * @return true if the transaction exists
      */
-    public boolean isTransactionExist(final String transactionId) {
+    private  boolean isTransactionExist(final String transactionId) {
         return transactionRepository.exists(transactionId);
     }
 /**
@@ -126,14 +144,24 @@ public class TransactionService {
  */
 	public void addTransaction(final String accountId,final TransactionResponse transaction){
 		checkAccountId(accountId);
-		Transaction existingTrx=transactionRepository.findById(transaction.getId());
-		if(null!=existingTrx) {
+		if(isTransactionExist(transaction.getId())) {
 			throw new  ServiceException(ErrorCode.EXISTING_TRANSACTION,
 			        "The transaction already exists ");
 		}else {
 			transactionRepository.addTransaction(accountId, transaction);
 		}
 }
+
+	/**
+	 * update a transaction - makes checks before
+	 * @param accountId
+	 * @param transactionId TODO
+	 * @param transaction
+	 */
+	public void updateTransaction(final String accountId,String transactionId, final TransactionResponse transaction) {
+		checkTransaction(accountId,transactionId);
+		transactionRepository.updateTransaction(accountId, transactionId, transaction);
+	}
 
 
 }
