@@ -82,21 +82,32 @@ public class AdminTransactionTest extends AbstractTest {
 
 	@Test
 	public void deleteTransaction() throws Exception {
-		mockMvc.perform(delete("/accounts/1/transactions/1")).andExpect(
+        mockMvc.perform(delete("/accounts/1/transactions/delete/1")).andExpect(
 				status().isNoContent());
 	}
 
 	@Test
 	public void deleteTransactionWhichNotBelongToTheAccount() throws Exception {
-		mockMvc.perform(delete("/accounts/2/transactions/2")).andExpect(
+        mockMvc.perform(delete("/accounts/2/transactions/delete/2")).andExpect(
 				status().isForbidden());
 	}
 
 	@Test
 	public void deleteUnexistingTransaction() throws Exception {
-		mockMvc.perform(delete("/accounts/1/transactions/99")).andExpect(
+        mockMvc.perform(delete("/accounts/1/transactions/delete/99")).andExpect(
 				status().isNotFound());
 	}
+
+    /**
+     * test the deletion of transaction for an unexisting account
+     *
+     * @throws Exception
+     */
+    @Test
+    public void deleteTransactionUnexistingAccount() throws Exception {
+        mockMvc.perform(delete("/accounts/100/transactions/delete/1")).andExpect(
+                status().isNotFound());
+    }
 
 	/**
 	 * Get json request from test file

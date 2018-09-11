@@ -1,5 +1,7 @@
 package com.test.recruitment.controller.impl;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,8 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.test.recruitment.controller.TransactionController;
 import com.test.recruitment.json.TransactionResponse;
 import com.test.recruitment.service.TransactionService;
-
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * Implementation of {@link TransactionController}
@@ -43,5 +43,12 @@ public class TransactionControllerImpl implements TransactionController {
 			return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
 		}
 		return ResponseEntity.ok().body(page);
+	}
+
+	@Override
+	public ResponseEntity<Void> deleteTransaction(@PathVariable("accountId") String accountId, @PathVariable("transactionId") String transactionId) {
+		transactionService.deleteTransaction(accountId, transactionId);
+		log.info("The transaction {} of the account {} has been successfuly deleted ", transactionId, accountId);
+		return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
 	}
 }

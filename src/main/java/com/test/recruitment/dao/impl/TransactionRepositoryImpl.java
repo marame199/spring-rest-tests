@@ -27,7 +27,7 @@ public class TransactionRepositoryImpl implements TransactionRepository,
 	private List<Transaction> transactions;
 
 	@Override
-	public void afterPropertiesSet() throws Exception {
+    public void afterPropertiesSet() {
 		transactions = new ArrayList<>();
 		{
 			Transaction transaction = new Transaction();
@@ -65,9 +65,24 @@ public class TransactionRepositoryImpl implements TransactionRepository,
 	@Override
 	public Page<Transaction> getTransactionsByAccount(String accountId,
 			Pageable p) {
-		return new PageImpl<Transaction>(transactions.stream()
-				.filter(t -> t.getAccountId().equals(accountId))
-				.collect(Collectors.toList()));
-	}
+        return new PageImpl<Transaction>(getTransactionList(accountId));
+    }
 
+    @Override
+    public List<Transaction> getTransactionList(String accountId) {
+        return transactions.stream()
+				.filter(t -> t.getAccountId().equals(accountId))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public void deleteTransaction(String transactionId) {
+        transactions.remove(findById(transactionId));
+    }
+
+
+    @Override
+    public boolean exists(String transactionId) {
+        return transactions.stream().anyMatch(trx -> trx.getId().equals(transactionId));
+    }
 }

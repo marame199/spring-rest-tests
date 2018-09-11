@@ -10,9 +10,11 @@ import org.springframework.stereotype.Service;
 
 import com.test.recruitment.dao.TransactionRepository;
 import com.test.recruitment.entity.Transaction;
+import com.test.recruitment.exception.ServiceException;
 import com.test.recruitment.json.ErrorCode;
 import com.test.recruitment.json.TransactionResponse;
-import com.test.recruitment.exception.ServiceException;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Transaction service
@@ -21,20 +23,44 @@ import com.test.recruitment.exception.ServiceException;
  *
  */
 @Service
+@Slf4j
 public class TransactionService {
 
-	private AccountService accountService;
+	private final AccountService accountService;
 
-	private TransactionRepository transactionRepository;
+	private final TransactionRepository transactionRepository;
 
 	@Autowired
-	public TransactionService(AccountService accountService,
-			TransactionRepository transactionRepository) {
+	public TransactionService(final AccountService accountService,
+			final TransactionRepository transactionRepository) {
 		this.accountService = accountService;
 		this.transactionRepository = transactionRepository;
 	}
 
 	/**
+     * check the existence of the account and throw an exception if it does not exists
+     * @param accountId
+     */
+    private void checkAccountId(final String accountId) {
+        if (!accountService.isAccountExist(accountId)) {
+            throw new ServiceException(ErrorCode.NOT_FOUND_ACCOUNT,
+                    "Account doesn't exist");
+        }
+    }
+
+    /**
+     * check the existence of the transaction  and throw an exception if it does not exists
+     *
+     * @param transactionId
+     */
+    private void checkTransactionId(final String transactionId) {
+        if (!isTransactionExist(transactionId)) {
+            throw new ServiceException(ErrorCode.NOT_FOUND_TRANSACTION,
+                    "Transaction  doesn't exist");
+        }
+    }
+
+    /**
 	 * Get transactions by account
 	 * 
 	 * @param accountId
@@ -43,16 +69,32 @@ public class TransactionService {
 	 *            the pageable object
 	 * @return
 	 */
-	public Page<TransactionResponse> getTransactionsByAccount(String accountId,
-			Pageable p) {
-		if (!accountService.isAccountExist(accountId)) {
-			throw new ServiceException(ErrorCode.NOT_FOUND_ACCOUNT,
-					"Account doesn't exist");
-		}
-		return new PageImpl<TransactionResponse>(transactionRepository
-				.getTransactionsByAccount(accountId, p).getContent().stream()
-				.map(this::map).collect(Collectors.toList()));
-	}
+	public Page<TransactionResponse> getTransactionsByAccount(final String accountId,
+                                                              final Pageable p) {
+        checkAccountId(accountId);
+        return new PageImpl<>(transactionRepository
+                .getTransactionsByAccount(accountId, p).getContent().stream()
+                .map(this::map).collect(Collectors.toList()));
+    }
+
+    /**
+     * delete the transaction
+     *
+     * @param transactionId the transaction id
+     */
+    public void deleteTransaction(final String accountId, final String transactionId) throws ServiceException {
+        checkAccountId(accountId);
+        checkTransactionId(transactionId);
+        transactionRepository.getTransactionList(accountId)
+                .stream().
+                filter(trx -> transactionId.equals(trx.getId())).
+                findFirst().orElseThrow(() -> new ServiceException(ErrorCode.FORBIDDEN_TRANSACTION,
+                "Transaction forbidden "));
+        transactionRepository.deleteTransaction(transactionId);
+    }
+
+
+
 
 	/**
 	 * Map {@link Transaction} to {@link TransactionResponse}
@@ -60,12 +102,25 @@ public class TransactionService {
 	 * @param transaction
 	 * @return
 	 */
-	private TransactionResponse map(Transaction transaction) {
-		TransactionResponse result = new TransactionResponse();
-		result.setBalance(transaction.getBalance());
-		result.setId(transaction.getId());
-		result.setNumber(transaction.getNumber());
-		return result;
-	}
+    private TransactionResponse map(final Transaction transaction) {
+        final TransactionResponse result = new TransactionResponse();
+        result.setBalance(transaction.getBalance());
+        result.setId(transaction.getId());
+        result.setNumber(transaction.getNumber());
+        return result;
+    }
+
+    /**
+     * Check if a transaction  exists
+     *
+     * @param transactionId the transaction id
+     * @return true if the transaction exists
+     */
+    public boolean isTransactionExist(final String transactionId) {
+        return transactionRepository.exists(transactionId);
+    }
+
+
+
 
 }
