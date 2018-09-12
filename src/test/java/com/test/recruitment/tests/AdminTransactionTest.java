@@ -57,7 +57,7 @@ public class AdminTransactionTest extends AbstractTest {
 		final String request = getRequest("updateOk");
 
 		mockMvc.perform(
-				put("/accounts/1/transactions/update/3").contentType(
+				put("/accounts/1/transactions/update/1").contentType(
 						MediaType.APPLICATION_JSON).content(request))
 		.andExpect(status().isNoContent());
 	}
@@ -67,7 +67,7 @@ public class AdminTransactionTest extends AbstractTest {
 		final String request = getRequest("updateOk");
 
 		mockMvc.perform(
-				put("/accounts/2/transactions/update/3").contentType(
+				put("/accounts/2/transactions/update/1").contentType(
 						MediaType.APPLICATION_JSON).content(request))
 		.andExpect(status().isForbidden());
 	}

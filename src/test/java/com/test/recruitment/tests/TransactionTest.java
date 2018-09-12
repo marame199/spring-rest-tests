@@ -18,22 +18,22 @@ public class TransactionTest extends AbstractTest {
 	@Test
 	public void getTransactions() throws Exception {
 		mockMvc.perform(get("/accounts/1/transactions"))
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.totalElements", is(3)))
-				.andExpect(jsonPath("$.content[0].number", is("12151885120")))
-				.andExpect(jsonPath("$.content[0].balance", is(42.12)));
+		.andExpect(status().isOk())
+		.andExpect(jsonPath("$.totalElements", is(2)))
+		.andExpect(jsonPath("$.content[0].number", is("0000012")))
+		.andExpect(jsonPath("$.content[0].balance", is(12.0)));
 	}
 
 	@Test
 	public void getTransactionsNoContent() throws Exception {
-		mockMvc.perform(get("/accounts/2/transactions")).andExpect(
+		mockMvc.perform(get("/accounts/20/transactions")).andExpect(
 				status().isNoContent());
 	}
 
 	@Test
 	public void getTransactionsOnUnexistingAccount() throws Exception {
 		mockMvc.perform(get("/accounts/3/transactions"))
-				.andExpect(status().isNotFound())
-				.andExpect(jsonPath("$.errorCode", is("NOT_FOUND_ACCOUNT")));
+		.andExpect(status().isNotFound())
+		.andExpect(jsonPath("$.errorCode", is("NOT_FOUND_ACCOUNT")));
 	}
 }
