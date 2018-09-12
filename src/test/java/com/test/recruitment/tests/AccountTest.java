@@ -18,7 +18,7 @@ public class AccountTest extends AbstractTest {
 	@Test
 	public void getAccounts() throws Exception {
 		mockMvc.perform(get("/accounts")).andExpect(status().isOk())
-		.andExpect(jsonPath("$.totalElements", is(2)))
+				.andExpect(jsonPath("$.totalElements", is(3)))
 		.andExpect(jsonPath("$.content[0].type", is("saving1")))
 		.andExpect(jsonPath("$.content[0].balance", is(15.0)));
 	}

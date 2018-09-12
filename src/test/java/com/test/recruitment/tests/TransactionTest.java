@@ -20,8 +20,8 @@ public class TransactionTest extends AbstractTest {
 		mockMvc.perform(get("/accounts/1/transactions"))
 		.andExpect(status().isOk())
 		.andExpect(jsonPath("$.totalElements", is(2)))
-		.andExpect(jsonPath("$.content[0].number", is("0000012")))
-		.andExpect(jsonPath("$.content[0].balance", is(12.0)));
+		.andExpect(jsonPath("$.content[0].number", is("0000013")))
+				.andExpect(jsonPath("$.content[0].balance", is(13.0)));
 	}
 
 	@Test
