@@ -21,7 +21,52 @@ public class TransactionTest extends AbstractTest {
 		.andExpect(status().isOk())
 		.andExpect(jsonPath("$.totalElements", is(2)))
 		.andExpect(jsonPath("$.content[0].number", is("0000013")))
-				.andExpect(jsonPath("$.content[0].balance", is(13.0)));
+		.andExpect(jsonPath("$.content[0].balance", is(13.0)));
+	}
+
+	/**
+	 * Filter results by size
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void getTransactionsSizeFilter() throws Exception {
+		mockMvc.perform(get("/accounts/2/transactions?size=1")).andExpect(status().isOk())
+		.andExpect(jsonPath("$.totalElements", is(1)));
+	}
+
+	/**
+	 * Filter result by id asc
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void getTransactionsSortById() throws Exception {
+		mockMvc.perform(get("/accounts/2/transactions?sort=id,asc")).andExpect(status().isOk())
+		.andExpect(jsonPath("$.totalElements", is(2))).andExpect(jsonPath("$.content[0].id", is("3")))
+		.andExpect(jsonPath("$.content[1].id", is("4")));
+	}
+
+	/**
+	 * Filter result by id asc
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void getTransactionsFilterBySizeAndPage1() throws Exception {
+		mockMvc.perform(get("/accounts/2/transactions?size=1&page=1")).andExpect(status().isOk())
+		.andExpect(jsonPath("$.totalElements", is(1))).andExpect(jsonPath("$.content[0].id", is("4")));
+	}
+
+	/**
+	 * Filter result by id asc
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void getTransactionsFilterBySizeAndPage2() throws Exception {
+		mockMvc.perform(get("/accounts/2/transactions?size=1&page=0")).andExpect(status().isOk())
+		.andExpect(jsonPath("$.totalElements", is(1))).andExpect(jsonPath("$.content[0].id", is("3")));
 	}
 
 	@Test
