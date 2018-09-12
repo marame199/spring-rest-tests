@@ -66,6 +66,7 @@ public class TransactionService {
      * @param transactionId the trnasaction id to check
      */
     private void checkForbiddenTransaction(String accountId, String transactionId) {
+  
         transactionRepository.getTransactionList(accountId)
         .stream().
         filter(trx -> transactionId.equals(trx.getId())).
@@ -108,7 +109,7 @@ public class TransactionService {
      */
     public void deleteTransaction(final String accountId, final String transactionId) throws ServiceException {
     	checkTransaction(accountId,transactionId);
-        transactionRepository.deleteTransaction(transactionId);
+        transactionRepository.delete(transactionId);
     }
 
 
@@ -148,19 +149,27 @@ public class TransactionService {
 			throw new  ServiceException(ErrorCode.EXISTING_TRANSACTION,
 			        "The transaction already exists ");
 		}else {
-			transactionRepository.addTransaction(accountId, transaction);
+			Transaction trx= new Transaction();
+			trx.setAccountId(accountId);
+			trx.setBalance(transaction.getBalance());
+			trx.setNumber(transaction.getNumber());
+			trx.setId(transaction.getId());
+			transactionRepository.save(trx); 
 		}
 }
 
 	/**
 	 * update a transaction - makes checks before
 	 * @param accountId
-	 * @param transactionId TODO
+	 * @param transactionId 
 	 * @param transaction
 	 */
 	public void updateTransaction(final String accountId,String transactionId, final TransactionResponse transaction) {
 		checkTransaction(accountId,transactionId);
-		transactionRepository.updateTransaction(accountId, transactionId, transaction);
+		Transaction trx = transactionRepository.findOne(transactionId);
+		trx.setBalance(transaction.getBalance());
+		trx.setNumber(transaction.getNumber());
+		transactionRepository.save(trx);
 	}
 
 

@@ -4,9 +4,10 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.PagingAndSortingRepository;
 
 import com.test.recruitment.entity.Transaction;
-import com.test.recruitment.json.TransactionResponse;
 
 /**
  * Transaction repository
@@ -14,17 +15,7 @@ import com.test.recruitment.json.TransactionResponse;
  * @author A525125
  *
  */
-public interface TransactionRepository {
-
-
-	/**
-	 * Get transaction by Id
-	 *
-	 * @param id
-	 *            id of the transaction to get
-	 * @return the transaction corresponding to the given id or null
-	 */
-	Transaction findById(String id);
+public interface TransactionRepository extends PagingAndSortingRepository<Transaction, String> {
 
 	/**
 	 * Get transactions by account
@@ -35,6 +26,7 @@ public interface TransactionRepository {
 	 *            the pageable information
 	 * @return
 	 */
+	@Query(value = "select trx from Transaction trx  where trx.accountId= ?1")
 	Page<Transaction> getTransactionsByAccount(String accountId, Pageable p);
 
 	/**
@@ -43,37 +35,7 @@ public interface TransactionRepository {
 	 * @param accountId the account id
 	 * @return a list of objects of type Transaction
 	 */
+	@Query("select trx from Transaction trx where trx.accountId= ?1")
 	List<Transaction> getTransactionList(String accountId);
 
-	/**
-	 * delete the transaction
-	 *
-	 * @param transactionId the transaction id
-	 */
-	void deleteTransaction(String transactionId);
-
-	/**
-	 * check if a transaction exists
-	 *
-	 * @param transactionId the transaction id
-	 * @return true if the  transaction exist
-	 */
-	boolean exists(String transactionId);
-
-	/**
-	 * create a new transaction for the account
-	 * 
-	 * @param accountId   the account id
-	 * @param transaction the transaction associated to the account
-	 */
-	void addTransaction(String accountId, TransactionResponse transaction);
-
-	/**
-	 * update a transaction
-	 * 
-	 * @param accountId   the account id
-	 * @param transactionId TODO
-	 * @param transaction the transaction associated to the account
-	 */
-	void updateTransaction(String accountId, String transactionId, TransactionResponse transaction);
 }

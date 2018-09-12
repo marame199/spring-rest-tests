@@ -1,5 +1,6 @@
 package com.test.recruitment.service;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +43,7 @@ public class AccountService {
 	 * @return the account list
 	 */
 	public Page<AccountResponse> getAccounts(Pageable p) {
+		List<Account> list= (List<Account>) accountRepository.findAll();
 		return new PageImpl<AccountResponse>(accountRepository.findAll(p)
 				.getContent().stream().map(this::mapToAccountResponse)
 				.collect(Collectors.toList()));
@@ -67,9 +69,11 @@ public class AccountService {
 	 */
 	public AccountDetailsResponse getAccountDetails(String accountId) {
 		log.debug("Find account {}", accountId);
-		Account account = accountRepository.findById(accountId).orElseThrow(
-				() -> new ServiceException(ErrorCode.NOT_FOUND_ACCOUNT,
-						"Account doesn't exist"));
+		Account account = accountRepository.findOne(accountId);
+		if(null==account) {
+			throw new ServiceException(ErrorCode.NOT_FOUND_ACCOUNT,
+					"Account doesn't exist");
+		}
 		return mapToAccountDetailsResponse(account);
 	}
 
