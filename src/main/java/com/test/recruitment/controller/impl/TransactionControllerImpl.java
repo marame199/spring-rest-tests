@@ -1,7 +1,5 @@
 package com.test.recruitment.controller.impl;
 
-import lombok.extern.slf4j.Slf4j;
-
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,9 +13,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.test.recruitment.controller.TransactionController;
-import com.test.recruitment.entity.Transaction;
 import com.test.recruitment.json.TransactionResponse;
 import com.test.recruitment.service.TransactionService;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Implementation of {@link TransactionController}
@@ -29,18 +28,18 @@ import com.test.recruitment.service.TransactionService;
 @RestController
 public class TransactionControllerImpl implements TransactionController {
 
-	private TransactionService transactionService;
+	private final TransactionService transactionService;
 
 	@Autowired
-	public TransactionControllerImpl(TransactionService transactionService) {
+	public TransactionControllerImpl(final TransactionService transactionService) {
 		this.transactionService = transactionService;
 	}
 
 	@Override
 	public ResponseEntity<Page<TransactionResponse>> getTransactionsByAccount(
-			@PathVariable("accountId") String accountId,
-			@PageableDefault Pageable p) {
-		Page<TransactionResponse> page = transactionService
+			@PathVariable("accountId") final String accountId,
+			@PageableDefault final Pageable p) {
+		final Page<TransactionResponse> page = transactionService
 				.getTransactionsByAccount(accountId, p);
 		if (null == page || page.getTotalElements() == 0) {
 			log.debug("Cannot find transaction for account {}", accountId);
@@ -50,24 +49,24 @@ public class TransactionControllerImpl implements TransactionController {
 	}
 
 	@Override
-	public ResponseEntity<Void> deleteTransaction(@PathVariable("accountId") String accountId, @PathVariable("transactionId") String transactionId) {
+	public ResponseEntity<Void> deleteTransaction(@PathVariable("accountId") final String accountId, @PathVariable("transactionId") final String transactionId) {
 		transactionService.deleteTransaction(accountId, transactionId);
 		log.info("The transaction {} of the account {} has been successfuly deleted ", transactionId, accountId);
-		return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
 	@Override
-	public ResponseEntity<Void> addTransaction(@PathVariable("accountId") String accountId, @Valid @RequestBody TransactionResponse transaction) {
+	public ResponseEntity<Void> addTransaction(@PathVariable("accountId") final String accountId, @Valid @RequestBody final TransactionResponse transaction) {
 		transactionService.addTransaction(accountId, transaction);
 		log.info("The transaction has been succesfussly created for the accound {} ", accountId);
-		return new ResponseEntity<Void>(HttpStatus.CREATED);
+		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
 
 	@Override
-	public ResponseEntity<Void> updateTransaction(@PathVariable("accountId") String accountId, @PathVariable String transactionId, @Valid @RequestBody TransactionResponse transaction) {
+	public ResponseEntity<Void> updateTransaction(@PathVariable("accountId") final String accountId, @PathVariable final String transactionId, @Valid @RequestBody final TransactionResponse transaction) {
 		transactionService.updateTransaction(accountId, transactionId, transaction);
 		log.info("The transaction {}  has been succesfussly updated for the accound {} ", transactionId, accountId);
-		return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 	
 }

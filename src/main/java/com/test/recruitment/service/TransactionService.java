@@ -14,8 +14,6 @@ import com.test.recruitment.exception.ServiceException;
 import com.test.recruitment.json.ErrorCode;
 import com.test.recruitment.json.TransactionResponse;
 
-import lombok.extern.slf4j.Slf4j;
-
 /**
  * Transaction service
  * 
@@ -23,7 +21,6 @@ import lombok.extern.slf4j.Slf4j;
  *
  */
 @Service
-@Slf4j
 public class TransactionService {
 
 	private final AccountService accountService;
@@ -65,7 +62,7 @@ public class TransactionService {
      * @param accountId the account id 
      * @param transactionId the trnasaction id to check
      */
-    private void checkForbiddenTransaction(String accountId, String transactionId) {
+    private void checkForbiddenTransaction(final String accountId, final String transactionId) {
   
         transactionRepository.getTransactionList(accountId)
         .stream().
@@ -79,7 +76,7 @@ public class TransactionService {
      * @param accountId
      * @param transactionId
      */
-    private void checkTransaction(String accountId, String transactionId) {
+    private void checkTransaction(final String accountId, final String transactionId) {
         checkAccountId(accountId);
         checkTransactionId(transactionId);
         checkForbiddenTransaction(accountId, transactionId);
@@ -149,7 +146,7 @@ public class TransactionService {
 			throw new  ServiceException(ErrorCode.EXISTING_TRANSACTION,
 			        "The transaction already exists ");
 		}else {
-			Transaction trx= new Transaction();
+			final Transaction trx= new Transaction();
 			trx.setAccountId(accountId);
 			trx.setBalance(transaction.getBalance());
 			trx.setNumber(transaction.getNumber());
@@ -164,9 +161,9 @@ public class TransactionService {
 	 * @param transactionId 
 	 * @param transaction
 	 */
-	public void updateTransaction(final String accountId,String transactionId, final TransactionResponse transaction) {
+	public void updateTransaction(final String accountId,final String transactionId, final TransactionResponse transaction) {
 		checkTransaction(accountId,transactionId);
-		Transaction trx = transactionRepository.findOne(transactionId);
+		final Transaction trx = transactionRepository.findOne(transactionId);
 		trx.setBalance(transaction.getBalance());
 		trx.setNumber(transaction.getNumber());
 		transactionRepository.save(trx);
